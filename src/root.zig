@@ -14,13 +14,13 @@ const pi: f32 = 3.14159265358979323846264338327950288;
 const tau: f32 = 6.28318530717958647692528676655900577;
 
 pub const Point = struct {
-    x: i32,
-    y: i32,
+    x: i32 = 0,
+    y: i32 = 0,
 };
 
 pub const Size = struct {
-    width: i32,
-    height: i32,
+    width: i32 = 1,
+    height: i32 = 1,
 };
 
 pub const Angle = struct {
@@ -47,9 +47,9 @@ pub const Angle = struct {
 };
 
 pub const RGB = struct {
-    r: u8,
-    g: u8,
-    b: u8,
+    r: u8 = 0,
+    g: u8 = 0,
+    b: u8 = 0,
 };
 
 pub const Color = enum(i32) {
@@ -90,14 +90,14 @@ pub const Color = enum(i32) {
 };
 
 pub const Style = struct {
-    fill_color: Color,
-    stroke_color: Color,
-    stroke_width: i32,
+    fill_color: Color = .none,
+    stroke_color: Color = .none,
+    stroke_width: i32 = 0,
 };
 
 pub const LineStyle = struct {
-    color: Color,
-    width: i32,
+    color: Color = .none,
+    width: i32 = 1,
 };
 
 pub const File = []u8;
