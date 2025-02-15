@@ -194,6 +194,15 @@ pub fn setColor(c: Color, v: RGB) void {
     bindings.set_color(@intFromEnum(c), v.r, v.g, v.b);
 }
 
+/// Set a color value in the palette, using a hexadecimal value.
+pub fn setColorHex(c: Color, hex: u32) void {
+    setColor(c, .{
+        .r = @intCast(hex >> 16 & 0xFF),
+        .g = @intCast(hex >> 8 & 0xFF),
+        .b = @intCast(hex & 0xFF),
+    });
+}
+
 /// Set a single point (1 pixel is scaling is 1) on the frame.
 pub fn drawPoint(p: Point, c: Color) void {
     bindings.draw_point(p.x, p.y, @intFromEnum(c));
