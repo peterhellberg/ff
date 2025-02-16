@@ -225,6 +225,18 @@ pub const Color = enum(i32) {
     gray,
     /// Dark gray color: #333C57.
     dark_gray,
+
+    pub fn screen(self: Color) void {
+        clearScreen(self);
+    }
+
+    pub fn set(self: Color, v: RGB) void {
+        setColor(self, v);
+    }
+
+    pub fn hex(self: Color, h: u32) void {
+        setColor(self, RGB.from_hex(h));
+    }
 };
 
 pub const Style = struct {
