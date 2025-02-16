@@ -52,6 +52,15 @@ pub const RGB = struct {
     r: u8 = 0,
     g: u8 = 0,
     b: u8 = 0,
+
+    /// A RGB color for the given hexadecimal number.
+    pub fn from_hex(hex: u32) RGB {
+        return .{
+            .r = @intCast(hex >> 16 & 0xFF),
+            .g = @intCast(hex >> 8 & 0xFF),
+            .b = @intCast(hex & 0xFF),
+        };
+    }
 };
 
 pub const Color = enum(i32) {
@@ -198,11 +207,7 @@ pub fn setColor(c: Color, v: RGB) void {
 
 /// Set a color value in the palette, using a hexadecimal value.
 pub fn setColorHex(c: Color, hex: u32) void {
-    setColor(c, .{
-        .r = @intCast(hex >> 16 & 0xFF),
-        .g = @intCast(hex >> 8 & 0xFF),
-        .b = @intCast(hex & 0xFF),
-    });
+    setColor(c, RGB.from_hex(hex));
 }
 
 /// Set a single point (1 pixel is scaling is 1) on the frame.
