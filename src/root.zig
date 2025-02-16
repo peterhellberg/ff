@@ -246,37 +246,37 @@ pub const RGB = struct {
 pub const Color = enum(i32) {
     /// No color (100% transparency).
     none,
-    /// Black color: #1A1C2C.
+    /// Black default: #1A1C2C.
     black,
-    /// Purple color: #5D275D.
+    /// Purple default: #5D275D.
     purple,
-    /// Red color: #B13E53.
+    /// Red default: #B13E53.
     red,
-    /// Orange color: #EF7D57.
+    /// Orange default: #EF7D57.
     orange,
-    /// Yellow color: #FFCD75.
+    /// Yellow default: #FFCD75.
     yellow,
-    /// Light green color: #A7F070.
+    /// Light green default: #A7F070.
     light_green,
-    /// Green color: #38B764.
+    /// Green default: #38B764.
     green,
-    /// Dark green color: #257179.
+    /// Dark green default: #257179.
     dark_green,
-    /// Dark blue color: #29366F.
+    /// Dark blue default: #29366F.
     dark_blue,
-    /// Blue color: #3B5DC9.
+    /// Blue default: #3B5DC9.
     blue,
-    /// Light blue color: #41A6F6.
+    /// Light blue default: #41A6F6.
     light_blue,
-    /// Cyan color: #73EFF7.
+    /// Cyan default: #73EFF7.
     cyan,
-    /// White color: #F4F4F4.
+    /// White default: #F4F4F4.
     white,
-    /// Light gray color: #94B0C2.
+    /// Light gray default: #94B0C2.
     light_gray,
-    /// Gray color: #566C86.
+    /// Gray default: #566C86.
     gray,
-    /// Dark gray color: #333C57.
+    /// Dark gray default: #333C57.
     dark_gray,
 
     /// screen clear the screen with the Color.
@@ -292,6 +292,50 @@ pub const Color = enum(i32) {
     /// hex sets the Color to the provided HEX value.
     pub fn hex(self: Color, h: u32) void {
         setColor(self, RGB.from_hex(h));
+    }
+};
+
+/// Palette of all the available colors.
+///
+/// The default palette is based on
+/// https://lospec.com/palette-list/sweetie-16
+///
+pub const Palette = struct {
+    black: u32 = 0x1A1C2C,
+    purple: u32 = 0x5D275D,
+    red: u32 = 0xB13E53,
+    orange: u32 = 0xEF7D57,
+    yellow: u32 = 0xFFCD75,
+    light_green: u32 = 0xA7F070,
+    green: u32 = 0x38B764,
+    dark_green: u32 = 0x257179,
+    dark_blue: u32 = 0x29366F,
+    blue: u32 = 0x3B5DC9,
+    light_blue: u32 = 0x41A6F6,
+    cyan: u32 = 0x73EFF7,
+    white: u32 = 0xF4F4F4,
+    light_gray: u32 = 0x94B0C2,
+    gray: u32 = 0x566C86,
+    dark_gray: u32 = 0x333C57,
+
+    // set each Color based on the Palette.
+    pub fn set(self: Palette) void {
+        setColorHex(.black, self.black);
+        setColorHex(.purple, self.purple);
+        setColorHex(.red, self.red);
+        setColorHex(.orange, self.orange);
+        setColorHex(.yellow, self.yellow);
+        setColorHex(.light_green, self.light_green);
+        setColorHex(.green, self.green);
+        setColorHex(.dark_green, self.dark_green);
+        setColorHex(.dark_blue, self.dark_blue);
+        setColorHex(.blue, self.blue);
+        setColorHex(.light_blue, self.light_blue);
+        setColorHex(.cyan, self.cyan);
+        setColorHex(.white, self.white);
+        setColorHex(.light_gray, self.light_gray);
+        setColorHex(.gray, self.gray);
+        setColorHex(.dark_gray, self.dark_gray);
     }
 };
 
