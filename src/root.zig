@@ -15,6 +15,8 @@ pub const height: i32 = 160;
 const pi: f32 = 3.14159265358979323846264338327950288;
 const tau: f32 = 6.28318530717958647692528676655900577;
 
+pub const Vec = @Vector(2, f32);
+
 pub const Point = struct {
     x: i32 = 0,
     y: i32 = 0,
@@ -23,6 +25,13 @@ pub const Point = struct {
         return .{
             .x = x,
             .y = y,
+        };
+    }
+
+    pub fn from_vec(v: Vec) Point {
+        return .{
+            .x = @intFromFloat(v[0]),
+            .y = @intFromFloat(v[1]),
         };
     }
 
@@ -59,6 +68,20 @@ pub const Point = struct {
 
     pub fn len(self: Point) f32 {
         return @sqrt(self.dot(self));
+    }
+
+    pub fn vec(self: Point) Vec {
+        return .{
+            @floatFromInt(self.x),
+            @floatFromInt(self.y),
+        };
+    }
+
+    pub fn lerp(self: Point, other: Point, t: f32) Point {
+        const from = self.vec();
+        const to = other.vec();
+
+        return Point.from_vec(from + (to - from) * @as(Vec, @splat(t)));
     }
 
     pub fn rect(self: Point, size: Size) Rect {
