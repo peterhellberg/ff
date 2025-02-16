@@ -21,6 +21,7 @@ pub const Point = struct {
     x: i32 = 0,
     y: i32 = 0,
 
+    /// new creates a new Point with the given x and y.
     pub fn new(x: i32, y: i32) Point {
         return .{
             .x = x,
@@ -28,6 +29,7 @@ pub const Point = struct {
         };
     }
 
+    /// min creates a Point with x and y both set to 0.
     pub fn min() Point {
         return .{
             .x = 0,
@@ -35,6 +37,7 @@ pub const Point = struct {
         };
     }
 
+    /// max creates a Point with x=width and y=height.
     pub fn max() Point {
         return .{
             .x = width,
@@ -42,6 +45,7 @@ pub const Point = struct {
         };
     }
 
+    /// center creates a Point with x=width/2 and y=height/2.
     pub fn center() Point {
         return .{
             .x = width / 2,
@@ -49,6 +53,7 @@ pub const Point = struct {
         };
     }
 
+    /// from_vec creates a Point based on the provided Vec.
     pub fn from_vec(v: Vec) Point {
         return .{
             .x = @intFromFloat(v[0]),
@@ -56,6 +61,7 @@ pub const Point = struct {
         };
     }
 
+    /// add creates a Point by adding the other Point to self.
     pub fn add(self: Point, other: Point) Point {
         return .{
             .x = self.x + other.x,
@@ -63,6 +69,7 @@ pub const Point = struct {
         };
     }
 
+    /// sub creates a Point by subtracting the other Point from self.
     pub fn sub(self: Point, other: Point) Point {
         return .{
             .x = self.x - other.x,
@@ -70,6 +77,7 @@ pub const Point = struct {
         };
     }
 
+    /// mul creates a Point by multiplying the other Point with self.
     pub fn mul(self: Point, other: Point) Point {
         return .{
             .x = self.x * other.x,
@@ -77,20 +85,24 @@ pub const Point = struct {
         };
     }
 
+    /// eql checks if the other Point is equal to self.
     pub fn eql(self: Point, other: Point) bool {
         return self.x == other.x and self.y == other.y;
     }
 
+    /// dot calculates the dot product for self and the other Point.
     pub fn dot(self: Point, other: Point) f32 {
         const p = self.mul(other);
 
         return @floatFromInt(p.x + p.y);
     }
 
+    /// len calculates the length of self.
     pub fn len(self: Point) f32 {
         return @sqrt(self.dot(self));
     }
 
+    /// vec creates a Vec based on self.
     pub fn vec(self: Point) Vec {
         return .{
             @floatFromInt(self.x),
@@ -98,6 +110,7 @@ pub const Point = struct {
         };
     }
 
+    /// lerp creates a Point between self and other Point, linearly interpolated by t.
     pub fn lerp(self: Point, other: Point, t: f32) Point {
         const from = self.vec();
         const to = other.vec();
@@ -105,10 +118,12 @@ pub const Point = struct {
         return from_vec(from + (to - from) * @as(Vec, @splat(t)));
     }
 
+    /// scale creates a Point by scaling it by the given scalar.
     pub fn scale(self: Point, scalar: f32) Point {
         return from_vec(self.vec() * @as(Vec, @splat(scalar)));
     }
 
+    /// rect creates a Rect with the given Size at self.
     pub fn rect(self: Point, size: Size) Rect {
         return .{
             .point = self,
@@ -116,6 +131,7 @@ pub const Point = struct {
         };
     }
 
+    /// draw the Point in the given Color.
     pub fn draw(self: Point, c: Color) void {
         drawPoint(self, c);
     }
@@ -125,6 +141,7 @@ pub const Size = struct {
     width: i32 = 1,
     height: i32 = 1,
 
+    /// new creates a new Size with the given w and h.
     pub fn new(w: i32, h: i32) Size {
         return .{
             .width = w,
@@ -132,6 +149,7 @@ pub const Size = struct {
         };
     }
 
+    /// vec creates a Vec based on self.
     pub fn vec(self: Size) Vec {
         return .{
             @floatFromInt(self.width),
@@ -139,6 +157,7 @@ pub const Size = struct {
         };
     }
 
+    /// rect creates a Rect with the given Point and size self.
     pub fn rect(self: Size, point: Point) Rect {
         return .{
             .point = point,
@@ -151,6 +170,7 @@ pub const Rect = struct {
     point: Point = .{},
     size: Size = .{},
 
+    /// new creates a new Rect with the given x, y, w and h.
     pub fn new(x: i32, y: i32, w: i32, h: i32) Rect {
         return .{
             .point = .{ .x = x, .y = y },
@@ -158,10 +178,12 @@ pub const Rect = struct {
         };
     }
 
+    /// min creates a Point for the top left of the rectangle.
     pub fn min(self: Rect) Point {
         return self.point;
     }
 
+    /// max creates a Point for the bottom right of the rectangle.
     pub fn max(self: Rect) Point {
         return self.point.add(.{
             .x = self.size.width,
@@ -169,6 +191,7 @@ pub const Rect = struct {
         });
     }
 
+    /// contains checks if the given Point is inside the Rect or not.
     pub fn contains(self: Rect, p: Point) bool {
         const tl = self.min();
         const br = self.max();
@@ -176,6 +199,7 @@ pub const Rect = struct {
         return (p.x >= tl.x and p.x <= br.x and p.y >= tl.y and p.y <= br.y);
     }
 
+    /// draw the Rect in the given Style.
     pub fn draw(self: Rect, s: Style) void {
         drawRect(self.point, self.size, s);
     }
@@ -255,14 +279,17 @@ pub const Color = enum(i32) {
     /// Dark gray color: #333C57.
     dark_gray,
 
+    /// screen clear the screen with the Color.
     pub fn screen(self: Color) void {
         clearScreen(self);
     }
 
+    /// set the Color to the provided RGB value.
     pub fn set(self: Color, v: RGB) void {
         setColor(self, v);
     }
 
+    /// hex sets the Color to the provided HEX value.
     pub fn hex(self: Color, h: u32) void {
         setColor(self, RGB.from_hex(h));
     }
