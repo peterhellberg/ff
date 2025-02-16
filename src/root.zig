@@ -18,6 +18,41 @@ const tau: f32 = 6.28318530717958647692528676655900577;
 pub const Point = struct {
     x: i32 = 0,
     y: i32 = 0,
+
+    pub fn add(self: Point, other: Point) Point {
+        return .{
+            .x = self.x + other.x,
+            .y = self.y + other.y,
+        };
+    }
+
+    pub fn sub(self: Point, other: Point) Point {
+        return .{
+            .x = self.x - other.x,
+            .y = self.y - other.y,
+        };
+    }
+
+    pub fn mul(self: Point, other: Point) Point {
+        return .{
+            .x = self.x * other.x,
+            .y = self.y * other.y,
+        };
+    }
+
+    pub fn eql(self: Point, other: Point) bool {
+        return self.x == other.x and self.y == other.y;
+    }
+
+    pub fn dot(self: Point, other: Point) f32 {
+        const p = self.mul(other);
+
+        return @floatFromInt(p.x + p.y);
+    }
+
+    pub fn len(self: Point) f32 {
+        return @sqrt(self.dot(self));
+    }
 };
 
 pub const Size = struct {
