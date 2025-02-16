@@ -60,11 +60,58 @@ pub const Point = struct {
     pub fn len(self: Point) f32 {
         return @sqrt(self.dot(self));
     }
+
+    pub fn rect(self: Point, size: Size) Rect {
+        return .{
+            .point = self,
+            .size = size,
+        };
+    }
 };
 
 pub const Size = struct {
     width: i32 = 1,
     height: i32 = 1,
+
+    pub fn new(w: i32, h: i32) Size {
+        return .{
+            .width = w,
+            .height = h,
+        };
+    }
+
+    pub fn rect(self: Size, point: Point) Rect {
+        return .{
+            .point = point,
+            .size = self,
+        };
+    }
+};
+
+pub const Rect = struct {
+    point: Point = .{},
+    size: Size = .{},
+
+    pub fn new(x: i32, y: i32, w: i32, h: i32) Rect {
+        return .{
+            .point = .{ .x = x, .y = y },
+            .size = .{ .width = w, .height = h },
+        };
+    }
+
+    pub fn max(self: Rect) Point {
+        return self.point.add(.{
+            .x = self.size.width,
+            .y = self.size.height,
+        });
+    }
+
+    pub fn contains(self: Rect, p: Point) bool {
+        const tl = self.point;
+        const br = self.max();
+
+        return (p.x >= tl.x and p.x <= br.x and p.y >= tl.y and p.y <= br.y);
+    }
 };
 
 pub const Angle = struct {
