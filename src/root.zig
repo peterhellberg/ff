@@ -103,6 +103,13 @@ pub const Size = struct {
         };
     }
 
+    pub fn vec(self: Size) Vec {
+        return .{
+            @floatFromInt(self.width),
+            @floatFromInt(self.height),
+        };
+    }
+
     pub fn rect(self: Size, point: Point) Rect {
         return .{
             .point = point,
@@ -122,6 +129,10 @@ pub const Rect = struct {
         };
     }
 
+    pub fn min(self: Rect) Point {
+        return self.point;
+    }
+
     pub fn max(self: Rect) Point {
         return self.point.add(.{
             .x = self.size.width,
@@ -130,7 +141,7 @@ pub const Rect = struct {
     }
 
     pub fn contains(self: Rect, p: Point) bool {
-        const tl = self.point;
+        const tl = self.min();
         const br = self.max();
 
         return (p.x >= tl.x and p.x <= br.x and p.y >= tl.y and p.y <= br.y);
