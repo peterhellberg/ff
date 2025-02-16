@@ -94,6 +94,10 @@ pub const Point = struct {
             .size = size,
         };
     }
+
+    pub fn draw(self: Point, c: Color) void {
+        drawPoint(self, c);
+    }
 };
 
 pub const Size = struct {
@@ -149,6 +153,10 @@ pub const Rect = struct {
         const br = self.max();
 
         return (p.x >= tl.x and p.x <= br.x and p.y >= tl.y and p.y <= br.y);
+    }
+
+    pub fn draw(self: Rect, s: Style) void {
+        drawRect(self.point, self.size, s);
     }
 };
 
