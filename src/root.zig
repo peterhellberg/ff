@@ -1,7 +1,9 @@
 const std = @import("std");
 
 const bindings = @import("bindings.zig");
+
 pub const audio = @import("audio.zig");
+pub const draw = @import("draw.zig");
 
 comptime {
     std.testing.refAllDecls(@This());
