@@ -81,7 +81,11 @@ pub const Point = struct {
         const from = self.vec();
         const to = other.vec();
 
-        return Point.from_vec(from + (to - from) * @as(Vec, @splat(t)));
+        return from_vec(from + (to - from) * @as(Vec, @splat(t)));
+    }
+
+    pub fn scale(self: Point, scalar: f32) Point {
+        return from_vec(self.vec() * @as(Vec, @splat(scalar)));
     }
 
     pub fn rect(self: Point, size: Size) Rect {
