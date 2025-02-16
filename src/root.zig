@@ -28,6 +28,27 @@ pub const Point = struct {
         };
     }
 
+    pub fn min() Point {
+        return .{
+            .x = 0,
+            .y = 0,
+        };
+    }
+
+    pub fn max() Point {
+        return .{
+            .x = width,
+            .y = height,
+        };
+    }
+
+    pub fn center() Point {
+        return .{
+            .x = width / 2,
+            .y = height / 2,
+        };
+    }
+
     pub fn from_vec(v: Vec) Point {
         return .{
             .x = @intFromFloat(v[0]),
