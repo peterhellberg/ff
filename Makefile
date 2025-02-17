@@ -1,4 +1,4 @@
-TEST_ARGS = -fPIC -target x86-linux -L./lib -lstub ./src/root.zig
+TEST_ARGS = -fPIC -target x86-linux -L./lib -lstub ./src/ff.zig
 
 .PHONY: all
 all: test
@@ -13,5 +13,5 @@ spy:
 
 .PHONY: docs
 docs:
-	zig build-lib -femit-docs src/root.zig
-	rm -f libroot.a*
+	zig build-lib -femit-docs src/ff.zig
+	rm -f libff.a*

@@ -1,22 +1,40 @@
+//! **ff** is a small [Zig](https://ziglang.org/) ⚡ module meant for
+//! making [Firefly Zero](https://fireflyzero.com/) games 🎮 _(and other apps)_
+//!
+//! Based on [firefly-zig](https://github.com/firefly-zero/firefly-zig)
+//!
+//! ![Firefly Zero app showing the Zig logo](https://play.c7.se/ff/zig/shots/1.png)
+
 const std = @import("std");
-
-const bindings = @import("bindings.zig");
-
-pub const audio = @import("audio.zig");
-pub const draw = @import("draw.zig");
 
 comptime {
     std.testing.refAllDecls(@This());
 }
 
+const bindings = @import("bindings.zig");
+
+// Audio functions
+pub const audio = @import("audio.zig");
+
+/// Drawing functions
+pub const draw = @import("draw.zig");
+
+/// Width of the screen is **240** pixels.
 pub const width: i32 = 240;
+
+/// Height of the screen is **160** pixels.
 pub const height: i32 = 160;
 
+/// An approximation of the mathematical constant π.
 const pi: f32 = 3.14159265358979323846264338327950288;
+
+/// An approximation of the mathematical constant τ.
 const tau: f32 = 6.28318530717958647692528676655900577;
 
+/// Vec is a `@Vector(2, f32)`
 pub const Vec = @Vector(2, f32);
 
+/// A point on the screen, containing x and y.
 pub const Point = struct {
     x: i32 = 0,
     y: i32 = 0,
@@ -182,6 +200,7 @@ test "Point.scale returns expected results" {
     }
 }
 
+/// Size of something, containing width and height.
 pub const Size = struct {
     width: i32 = 1,
     height: i32 = 1,
@@ -211,6 +230,7 @@ pub const Size = struct {
     }
 };
 
+/// Rect is a rectangle based on a [Point](#ff.Point) and a [Size](#ff.Size)
 pub const Rect = struct {
     point: Point = .{},
     size: Size = .{},
@@ -273,6 +293,9 @@ test "Rect.contains returns expected results" {
     }
 }
 
+/// Angle of something,
+/// can be created [from_degrees](#ff.Angle.from_degrees)
+/// and [from_radians](#ff.Angle.from_radians)
 pub const Angle = struct {
     radians: f32,
 
@@ -296,6 +319,9 @@ pub const Angle = struct {
     }
 };
 
+/// RGB color value containing r, g, and b.
+///
+/// Can be created [from_hex](#ff.RGB.from_hex).
 pub const RGB = struct {
     r: u8 = 0,
     g: u8 = 0,
@@ -311,6 +337,7 @@ pub const RGB = struct {
     }
 };
 
+/// Color enumeration.
 pub const Color = enum(i32) {
     /// No color (100% transparency).
     none,
@@ -436,44 +463,61 @@ pub const Pad = struct {
     y: i32,
 };
 
+/// Buttons represent the current button state for [Peer](#ff.Peer) (such as [me](#ff.getMe)).
 pub const Buttons = struct {
+    /// South button
     s: bool,
+    /// East button
     e: bool,
+    /// West button
     w: bool,
+    /// North button
     n: bool,
+    /// Menu button
     menu: bool,
 };
 
+/// Peer represents a user connected to the app,
+/// could be yourself ([me](#ff.getMe)), someone else, or everyone combined.
 pub const Peer = struct {
+    /// ID of the Peer.
     id: u8,
 
+    /// The combined Peer.
     pub const combined = Peer{ .id = 0xFF };
 
+    /// Check if two Peers are the same.
     pub fn eq(self: Peer, other: Peer) bool {
         return self.id == other.id;
     }
 };
 
+/// Peers represents a list of Peer.
 pub const Peers = struct {
     peers: u32,
 
+    /// Check if the Peers contain the given Peer.
     pub fn contains(self: Peers, p: Peer) bool {
         return (self.peers >> p.id) & 1 != 0;
     }
 
+    /// Return how many Peers there currently are.
     pub fn len(self: Peers) u32 {
         return @popCount(self.peers);
     }
 
+    /// Iterator for Peers.
     pub fn iter(self: Peers) PeersIter {
         return PeersIter{ .peer = 0, .peers = self.peers };
     }
 };
 
+/// Iterator for Peers.
 pub const PeersIter = struct {
     peer: u8,
     peers: u32,
 
+    /// Next Peer, or `null`.
     pub fn next(self: *PeersIter) ?Peer {
         while (self.peers != 0) {
             const peer = self.peer;
@@ -488,7 +532,10 @@ pub const PeersIter = struct {
     }
 };
 
+/// A Badge are an achievement that the game rewards to the player for doing some action.
 pub const Badge = u8;
+
+/// A Board (aka scoreboard or leaderboard) keep track of best scores of the player and their friends.
 pub const Board = u8;
 
 pub const Progress = struct {
@@ -497,6 +544,7 @@ pub const Progress = struct {
     /// How many points the player needs to earn the badge.
     goal: u16,
 
+    // Check if Progress has been earned or not.
     pub fn earned(self: Progress) bool {
         return self.done >= self.goal;
     }
@@ -806,10 +854,12 @@ pub fn getPeers() Peers {
     return Peers{ .peers = bindings.get_peers() };
 }
 
+/// Save the [Stash](#ff.Stash)
 pub fn saveStash(p: Peer, s: Stash) void {
     bindings.save_stash(p.id, @intFromPtr(s.ptr), s.len);
 }
 
+/// Load the [Stash](#ff.Stash), or `null`.
 pub fn loadStash(p: Peer, s: Stash) ?Stash {
     const size = bindings.load_stash(p.id, @intFromPtr(s.ptr), s.len);
     if (size == 0) {

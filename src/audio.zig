@@ -1,3 +1,5 @@
+//! Audio functionality for **ff**
+
 const bindings = @import("bindings.zig").audio;
 
 pub const sample_rate: u32 = 44_100;
