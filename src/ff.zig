@@ -428,42 +428,84 @@ pub const RGB = struct {
     }
 };
 
-/// Color enumeration.
+/// Color **`enum`** which is used to refer to
+/// each color in the [Palette](#ff.Palette),
+/// including `.none` which is transparent.
+///
 pub const Color = enum(i32) {
-    /// No color (100% transparency).
+    /// No color
+    ///
+    /// **100% transparency**
     none,
-    /// Black default: #1A1C2C.
+    /// Black
+    ///
+    /// Default: #1A1C2C
     black,
-    /// Purple default: #5D275D.
+    /// Purple
+    ///
+    /// Default: #5D275D
     purple,
-    /// Red default: #B13E53.
+    /// Red
+    ///
+    /// Default: #B13E53
     red,
-    /// Orange default: #EF7D57.
+    /// Orange
+    ///
+    /// Default: #EF7D57
     orange,
-    /// Yellow default: #FFCD75.
+    /// Yellow
+    ///
+    /// Default: #FFCD75
     yellow,
-    /// Light green default: #A7F070.
+    /// Light green
+    ///
+    /// Default: #A7F070
     light_green,
-    /// Green default: #38B764.
+    /// Green
+    ///
+    /// Default: #38B764
     green,
-    /// Dark green default: #257179.
+    /// Dark green
+    ///
+    /// Default: #257179
     dark_green,
-    /// Dark blue default: #29366F.
+    /// Dark blue
+    ///
+    /// Default: #29366F
     dark_blue,
-    /// Blue default: #3B5DC9.
+    /// Blue
+    ///
+    /// Default: #3B5DC9
     blue,
-    /// Light blue default: #41A6F6.
+    /// Light blue
+    ///
+    /// Default: #41A6F6
     light_blue,
-    /// Cyan default: #73EFF7.
+    /// Cyan
+    ///
+    /// Default: #73EFF7
     cyan,
-    /// White default: #F4F4F4.
+    /// White
+    ///
+    /// Default: #F4F4F4
     white,
-    /// Light gray default: #94B0C2.
+    /// Light gray
+    ///
+    /// Default: #94B0C2
     light_gray,
-    /// Gray default: #566C86.
+    /// Gray
+    ///
+    /// Default: #566C86
     gray,
-    /// Dark gray default: #333C57.
+    /// Dark gray
+    ///
+    /// Default: #333C57
     dark_gray,
+
+    /// num returns the Color for the given n.
+    pub fn num(n: i32) Color {
+        return @enumFromInt(n);
+    }
 
     /// screen clear the screen with the Color.
     pub fn screen(self: Color) void {
@@ -479,12 +521,54 @@ pub const Color = enum(i32) {
     pub fn hex(self: Color, h: u32) void {
         setColor(self, RGB.from_hex(h));
     }
+
+    /// prev Color before self.
+    pub fn prev(self: Color) Color {
+        const n: i32 = @intFromEnum(self);
+
+        if (n <= 0) return .none;
+        if (n == 1) return .dark_gray;
+
+        return @enumFromInt(n - 1);
+    }
+
+    /// next Color after self.
+    pub fn next(self: Color) Color {
+        const n: i32 = @intFromEnum(self);
+
+        if (n <= 0) return .none;
+        if (n > 15) return .black;
+
+        return @enumFromInt(n + 1);
+    }
 };
+
+test "Color prev and next work as expected" {
+    try std.testing.expectEqual(Color.black.prev().next().next().prev(), Color.black);
+    try std.testing.expectEqual(Color.dark_gray.prev().prev().prev().prev(), Color.cyan);
+    try std.testing.expectEqual(Color.red.next().next().next().next(), Color.green);
+}
 
 /// Palette of all the available colors.
 ///
-/// The default palette is based on
-/// https://lospec.com/palette-list/sweetie-16
+/// ### Default palette is [Sweetie 16](https://lospec.com/palette-list/sweetie-16)
+///
+///     ![#1A1C2C](images/1A1C2C.svg)
+///     ![#5D275D](images/5D275D.svg)
+///     ![#B13E53](images/B13E53.svg)
+///     ![#EF7D57](images/EF7D57.svg)
+///     ![#FFCD75](images/FFCD75.svg)
+///     ![#A7F070](images/A7F070.svg)
+///     ![#38B764](images/38B764.svg)
+///     ![#257179](images/257179.svg)
+///     ![#29366F](images/29366F.svg)
+///     ![#3B5DC9](images/3B5DC9.svg)
+///     ![#41A6F6](images/41A6F6.svg)
+///     ![#73EFF7](images/73EFF7.svg)
+///     ![#F4F4F4](images/F4F4F4.svg)
+///     ![#94B0C2](images/94B0C2.svg)
+///     ![#566C86](images/566C86.svg)
+///     ![#333C57](images/333C57.svg)
 ///
 pub const Palette = struct {
     black: u32 = 0x1A1C2C,
