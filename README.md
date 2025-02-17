@@ -10,3 +10,7 @@ Based on [firefly-zig](https://github.com/firefly-zero/firefly-zig)
 ## Usage
 
 You can have fetch the module by using `zig fetch --save <URL to zip/tarball>`
+
+## Documentation
+
+The generated documentation for `ff` is located at <https://peterhellberg.github.io/ff/> 📚
