@@ -137,6 +137,51 @@ pub const Point = struct {
     }
 };
 
+test "Point.lerp returns expected results" {
+    const tests = [_]struct {
+        e: Point,
+        f: f32,
+        a: Point,
+        b: Point,
+    }{
+        .{ .e = Point.new(15, 15), .f = 0.5, .a = Point.new(10, 10), .b = Point.new(20, 20) },
+        .{ .e = Point.new(15, 17), .f = 0.5, .a = Point.new(10, 15), .b = Point.new(20, 20) },
+        .{ .e = Point.new(13, 13), .f = 0.3, .a = Point.new(10, 10), .b = Point.new(20, 20) },
+    };
+
+    for (tests, 0..) |t, i| {
+        const actual = t.a.lerp(t.b, t.f);
+
+        try std.testing.expectEqual(t.e, actual);
+
+        if (false) {
+            std.debug.print("test {d}: {}.lerp({}, {}) = {}\n", .{ i, t.a, t.b, t.f, actual });
+        }
+    }
+}
+
+test "Point.scale returns expected results" {
+    const tests = [_]struct {
+        p: Point,
+        s: f32,
+        e: Point,
+    }{
+        .{ .p = Point.new(10, 10), .s = 0.5, .e = Point.new(5, 5) },
+        .{ .p = Point.new(10, 15), .s = 2, .e = Point.new(20, 30) },
+        .{ .p = Point.new(10, 10), .s = 10, .e = Point.new(100, 100) },
+    };
+
+    for (tests, 0..) |t, i| {
+        const actual = t.p.scale(t.s);
+
+        try std.testing.expectEqual(t.e, actual);
+
+        if (false) {
+            std.debug.print("test {d}: {}.scale({d}) -> {}\n", .{ i, t.p, t.s, actual });
+        }
+    }
+}
+
 pub const Size = struct {
     width: i32 = 1,
     height: i32 = 1,
@@ -204,6 +249,29 @@ pub const Rect = struct {
         drawRect(self.point, self.size, s);
     }
 };
+
+test "Rect.contains returns expected results" {
+    const tests = [_]struct {
+        e: bool,
+        r: Rect,
+        p: Point,
+    }{
+        .{ .e = true, .r = Rect.new(0, 0, 10, 10), .p = Point.new(5, 5) },
+        .{ .e = true, .r = Rect.new(0, 0, 10, 10), .p = Point.new(5, 10) },
+        .{ .e = true, .r = Rect.new(0, 0, 10, 10), .p = Point.new(10, 10) },
+        .{ .e = false, .r = Rect.new(0, 0, 10, 10), .p = Point.new(15, 10) },
+        .{ .e = false, .r = Rect.new(10, 10, 10, 10), .p = Point.new(5, 5) },
+        .{ .e = true, .r = Rect.new(10, 10, 10, 10), .p = Point.new(15, 15) },
+    };
+
+    for (tests, 0..) |t, i| {
+        try std.testing.expectEqual(t.e, t.r.contains(t.p));
+
+        if (false) {
+            std.debug.print("test {d}: r.contains({}) != {}\n", .{ i, t.p, t.e });
+        }
+    }
+}
 
 pub const Angle = struct {
     radians: f32,
@@ -648,14 +716,14 @@ pub fn loadFile(path: String, buf: []u8) []u8 {
 ///
 /// If you have a pre-allocated buffer of the right size, use loadFile() instead.
 ///
-/// null is returned if the file does not exist.
-pub fn loadFileBuf(path: String, alloc: std.mem.Allocator) ?[]u8 {
+/// error.FileNotFound is returned if the file does not exist.
+pub fn loadFileBuf(path: String, alloc: std.mem.Allocator) ![]u8 {
     const size = bindings.get_file_size(@intFromPtr(path.ptr), path.len);
     if (size == 0) {
-        return null;
+        return error.FileNotFound;
     }
     const buf = try alloc.alloc(u8, size);
-    bindings.load_file(@intFromPtr(path.ptr), path.len, @intFromPtr(buf.ptr), buf.len);
+    _ = bindings.load_file(@intFromPtr(path.ptr), path.len, @intFromPtr(buf.ptr), buf.len);
     return buf;
 }
 
@@ -664,7 +732,7 @@ pub fn loadFileBuf(path: String, alloc: std.mem.Allocator) ?[]u8 {
 /// If the file exists, it will be overwritten.
 /// If it doesn't exist, it will be created.
 pub fn dumpFile(path: String, buf: []const u8) void {
-    bindings.dump_file(@intFromPtr(path.ptr), path.len, @intFromPtr(buf.ptr), buf.len);
+    _ = bindings.dump_file(@intFromPtr(path.ptr), path.len, @intFromPtr(buf.ptr), buf.len);
 }
 
 /// Remove file (if exists) with the given name from the data dir.
@@ -711,7 +779,15 @@ pub fn setSeed(seed: u32) void {
 
 /// Get a random value.
 pub fn getRandom() u32 {
-    bindings.get_random();
+    return bindings.get_random();
+}
+
+test "getRandom returns values" {
+    const a = getRandom();
+    const b = getRandom();
+    const c = getRandom();
+
+    try std.testing.expectEqual(a + b + c, 12); // Stub always returns 4
 }
 
 /// Exit the app after the current update is finished.
@@ -755,11 +831,20 @@ pub fn getProgress(p: Peer, b: Badge) Progress {
 /// If the Peer is [`Peer.combined`], the progress is added to every peer
 /// and the returned value is the lowest progress.
 pub fn addProgress(p: Peer, b: Badge, val: i32) Progress {
-    const raw = bindings.add_progress(p.id, b, val);
+    const raw: i32 = @intCast(bindings.add_progress(p.id, b, val));
     return Progress{
         .done = @intCast(@as(i16, @truncate(raw >> 16))),
         .goal = @intCast(@as(i16, @truncate(raw & 0xFFFF))),
     };
+}
+
+test "addProgress" {
+    const actual = addProgress(.{ .id = 1 }, 2, 3);
+
+    try std.testing.expectEqual(Progress{
+        .done = 0,
+        .goal = 4, // Stub always returns 4
+    }, actual);
 }
 
 /// Get the personal best of the player.
