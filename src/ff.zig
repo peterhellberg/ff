@@ -1,7 +1,7 @@
 //! **ff** is a small [Zig](https://ziglang.org/) ⚡ module meant for
 //! making [Firefly Zero](https://fireflyzero.com/) games 🎮 _(and other apps)_
 //!
-//! _Based on [firefly-zig](https://github.com/firefly-zero/firefly-zig)_
+//! _Initially based on [firefly-zig](https://github.com/firefly-zero/firefly-zig)_
 //!
 //! #### Examples from <https://play.c7.se/ff/>
 //!

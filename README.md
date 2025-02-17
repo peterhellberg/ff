@@ -2,7 +2,7 @@
 
 A small [Zig](https://ziglang.org/) ⚡ module meant for making [Firefly Zero](https://fireflyzero.com/) games 🎮
 
-Based on [firefly-zig](https://github.com/firefly-zero/firefly-zig)
+Initially based on [firefly-zig](https://github.com/firefly-zero/firefly-zig)
 
 > [!IMPORTANT]
 > You might want to install the [ff-init](https://github.com/peterhellberg/ff-init) tool and use that instead of manually creating the files for your game.
