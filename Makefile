@@ -10,3 +10,8 @@ test:
 .PHONY: spy
 spy:
 	spy --exc .zig-cache --inc "**/*.zig" -q clear-zig test $(TEST_ARGS)
+
+.PHONY: docs
+docs:
+	zig build-lib -femit-docs src/root.zig
+	rm -f libroot.a*
