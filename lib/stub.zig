@@ -1,5 +1,9 @@
 export fn add_menu_item() void {}
-export fn add_progress() void {}
+
+export fn add_progress() u32 {
+    return 4;
+}
+
 export fn add_score() void {}
 export fn clear_screen() void {}
 export fn draw_arc() void {}
@@ -18,9 +22,11 @@ export fn dump_file() void {}
 export fn get_file_size() void {}
 export fn get_me() void {}
 export fn get_peers() void {}
+
 export fn get_random() u32 {
     return 4;
 }
+
 export fn load_file() void {}
 export fn load_stash() void {}
 export fn log_debug() void {}
