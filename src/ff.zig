@@ -1,9 +1,15 @@
 //! **ff** is a small [Zig](https://ziglang.org/) ⚡ module meant for
 //! making [Firefly Zero](https://fireflyzero.com/) games 🎮 _(and other apps)_
 //!
-//! Based on [firefly-zig](https://github.com/firefly-zero/firefly-zig)
+//! _Based on [firefly-zig](https://github.com/firefly-zero/firefly-zig)_
 //!
-//! ![Firefly Zero app showing the Zig logo](https://play.c7.se/ff/zig/shots/1.png)
+//! #### Examples from <https://play.c7.se/ff/>
+//!
+//!     [![](https://play.c7.se/ff/fp8x8/shots/1.png)](https://play.c7.se/ff/fp8x8/)
+//!     [![](https://play.c7.se/ff/rng/shots/2.png)](https://play.c7.se/ff/rng/)
+//!
+//! #### You might want to install the [ff-init](https://github.com/peterhellberg/ff-init) tool and use that instead of manually creating the files for your game.
+//!
 
 const std = @import("std");
 
