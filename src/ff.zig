@@ -8,7 +8,92 @@
 //!     [![](https://play.c7.se/ff/fp8x8/shots/1.png)](https://play.c7.se/ff/fp8x8/)
 //!     [![](https://play.c7.se/ff/rng/shots/2.png)](https://play.c7.se/ff/rng/)
 //!
-//! #### You might want to install the [ff-init](https://github.com/peterhellberg/ff-init) tool and use that instead of manually creating the files for your game.
+//! #### You might want to install [ff-init](https://github.com/peterhellberg/ff-init) ✨
+//!
+//!     _(and use that instead of manually creating the files for your game)_
+//!
+//! ##### Installation
+//!
+//! _(Requires you to have [Go](https://go.dev/dl/) installed)_
+//!
+//! ```
+//! go install github.com/peterhellberg/ff-init@latest
+//! ```
+//!
+//! ##### Usage
+//!
+//! _(Requires you to have a recent version of
+//! [Zig](https://ziglang.org/download/#release-master),
+//! [firefly_cli](https://docs.fireflyzero.com/user/installation/#-cli), and the
+//! [firefly-emulator](https://docs.fireflyzero.com/user/installation/#-emulator)
+//! installed)_
+//!
+//! ```
+//! ff-init myapp
+//! cd myapp
+//! zig build run
+//! ```
+//! 🌱
+//!
+//!
+//! ## Callbacks
+//!
+//! You often only _need_ to export the **`update`** and **`render`** functions,
+//! but there are a number of other [callbacks](https://docs.fireflyzero.com/dev/callbacks/)
+//! you can use as appropriate.
+//!
+//! **The available callbacks are:**
+//!
+//! - ### **`boot`**
+//!     > _Called only once, **after** all the memory is initialized and all runtime functions are
+//!     available but before any other callback is called. This is the best place to load
+//!     fonts, sprites, and other assets, initialize the default state, read configurations, etc._
+//!
+//!     ```
+//!     pub export fn boot() void {}
+//!     ```
+//!
+//! - ### **`update`**
+//!     > _Called **~60** times per second. It is guaranteed to be never called more often,
+//!     and it won’t be called less often if the game doesn’t consume too much resources.
+//!     This is the best place to update the state of objects, position of NPCs, read and
+//!     handle user input, etc._
+//!
+//!     ```
+//!     pub export fn update() void {}
+//!     ```
+//!
+//! - ### **`render`**
+//!     > _Called **before** updating the image on the screen. It might be called less often
+//!     than `update` if the device sees that the game is slow and needs more resources.
+//!     This is the best place to call all drawing functions._
+//!
+//!     ```
+//!     pub export fn render() void {}
+//!     ```
+//!
+//! - ### **`render_line`**
+//!     > _Called **before** updating a line of pixels on the screen. It accepts the line for
+//!     each it is called and returns the next line before which it should be called again.
+//!     For example, it is called with 0 first time and if it then returns 100,
+//!     it will be called again before rendering the line 100. If then it returns 0,
+//!     it will be called again only when rendering the next frame. Use it to update
+//!     the color palette on the fly if you want to display more than 16 colors on one frame._
+//!
+//!     **(It seems like this callback might not work as it should in the emulator just yet)**
+//!
+//!     ```
+//!     pub export fn render_line(l: i32) i32 {
+//!         return 0;
+//!     }
+//!     ```
+//!
+//! - ### **`before_exit`**
+//!     > _Called **before** the app is closed._
+//!
+//!     ```
+//!     pub export fn before_exit() void {}
+//!     ```
 //!
 
 const std = @import("std");
