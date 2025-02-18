@@ -7,6 +7,7 @@
 //!
 //!     [![](https://play.c7.se/ff/fp8x8/shots/1.png)](https://play.c7.se/ff/fp8x8/)
 //!     [![](https://play.c7.se/ff/rng/shots/2.png)](https://play.c7.se/ff/rng/)
+//!     [![](https://play.c7.se/ff/rot/shots/3.png)](https://play.c7.se/ff/rot/)
 //!
 //! #### You might want to install [ff-init](https://github.com/peterhellberg/ff-init) ✨
 //!
