@@ -13,5 +13,4 @@ spy:
 
 .PHONY: docs
 docs:
-	zig build-lib -femit-docs src/ff.zig
-	rm -f libff.a*
+	zig build-lib -fno-emit-bin -femit-docs src/ff.zig
