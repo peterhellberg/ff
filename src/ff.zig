@@ -392,22 +392,22 @@ pub const Angle = struct {
     radians: f32 = 0,
 
     /// The 360° angle.
-    pub const full_circle: Angle = Angle{ .radians = tau };
+    pub const full_circle: Angle = .{ .radians = tau };
     /// The 180° angle.
-    pub const half_circle: Angle = Angle{ .radians = pi };
+    pub const half_circle: Angle = .{ .radians = pi };
     /// The 90° angle.
-    pub const quarter_circle: Angle = Angle{ .radians = pi / 2.0 };
+    pub const quarter_circle: Angle = .{ .radians = pi / 2.0 };
     /// The 0° angle.
-    pub const zero: Angle = Angle{};
+    pub const zero: Angle = .{ .radians = 0.0 };
 
     /// An Angle in radians where `tau` (doubled `pi`) is the full circle.
-    pub fn from_radians(r: f32) Angle {
-        return Angle{ .radians = r };
+    pub fn fromRadians(r: f32) Angle {
+        return .{ .radians = r };
     }
 
     /// An Angle in degrees where **360.0** is the full circle.
-    pub fn from_degrees(d: f32) Angle {
-        return Angle{ .radians = d * pi / 180.0 };
+    pub fn fromDegrees(d: f32) Angle {
+        return .{ .radians = d * pi / 180.0 };
     }
 };
 
@@ -429,15 +429,15 @@ test "Angle.zero returns expected value" {
 }
 
 test "Angle.from_radians returns expected value" {
-    try std.testing.expectEqual(Angle{ .radians = pi }, Angle.from_radians(pi));
-    try std.testing.expectEqual(Angle{ .radians = tau }, Angle.from_radians(tau));
+    try std.testing.expectEqual(Angle{ .radians = pi }, Angle.fromRadians(pi));
+    try std.testing.expectEqual(Angle{ .radians = tau }, Angle.fromRadians(tau));
 }
 
 test "Angle.from_degrees returns expected value" {
-    try std.testing.expectEqual(Angle{ .radians = tau }, Angle.from_degrees(360.0));
-    try std.testing.expectEqual(Angle{ .radians = pi }, Angle.from_degrees(180.0));
-    try std.testing.expectEqual(Angle{ .radians = -pi }, Angle.from_degrees(-180.0));
-    try std.testing.expectEqual(Angle{ .radians = 0 }, Angle.from_degrees(0.0));
+    try std.testing.expectEqual(Angle{ .radians = tau }, Angle.fromDegrees(360.0));
+    try std.testing.expectEqual(Angle{ .radians = pi }, Angle.fromDegrees(180.0));
+    try std.testing.expectEqual(Angle{ .radians = -pi }, Angle.fromDegrees(-180.0));
+    try std.testing.expectEqual(Angle{ .radians = 0 }, Angle.fromDegrees(0.0));
 }
 
 /// RGB color value containing r, g, and b.
