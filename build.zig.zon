@@ -1,6 +1,7 @@
 .{
-    .name = "ff",
-    .version = "0.1.2",
+    .name = .ff,
+    .version = "0.1.3",
+    .fingerprint = 0xd6af1ab3b46f6e76,
     .paths = .{
         "src",
         "build.zig",
