@@ -17,6 +17,7 @@ export fn draw_rounded_rect() void {}
 export fn draw_sector() void {}
 export fn draw_sub_image() void {}
 export fn draw_text() void {}
+export fn draw_qr() void {}
 export fn draw_triangle() void {}
 export fn dump_file() void {}
 export fn get_file_size() void {}
