@@ -254,9 +254,9 @@ test "Point.lerp returns expected results" {
         a: Point,
         b: Point,
     }{
-        .{ .e = Point.new(15, 15), .f = 0.5, .a = Point.new(10, 10), .b = Point.new(20, 20) },
-        .{ .e = Point.new(15, 17), .f = 0.5, .a = Point.new(10, 15), .b = Point.new(20, 20) },
-        .{ .e = Point.new(13, 13), .f = 0.3, .a = Point.new(10, 10), .b = Point.new(20, 20) },
+        .{ .e = .new(15, 15), .f = 0.5, .a = .new(10, 10), .b = .new(20, 20) },
+        .{ .e = .new(15, 17), .f = 0.5, .a = .new(10, 15), .b = .new(20, 20) },
+        .{ .e = .new(13, 13), .f = 0.3, .a = .new(10, 10), .b = .new(20, 20) },
     };
 
     for (tests, 0..) |t, i| {
@@ -265,7 +265,13 @@ test "Point.lerp returns expected results" {
         try std.testing.expectEqual(t.e, actual);
 
         if (false) {
-            std.debug.print("test {d}: {}.lerp({}, {}) = {}\n", .{ i, t.a, t.b, t.f, actual });
+            std.debug.print("test {d}: {}.lerp({}, {}) = {}\n", .{
+                i,
+                t.a,
+                t.b,
+                t.f,
+                actual,
+            });
         }
     }
 }
@@ -276,9 +282,9 @@ test "Point.scale returns expected results" {
         s: f32,
         e: Point,
     }{
-        .{ .p = Point.new(10, 10), .s = 0.5, .e = Point.new(5, 5) },
-        .{ .p = Point.new(10, 15), .s = 2, .e = Point.new(20, 30) },
-        .{ .p = Point.new(10, 10), .s = 10, .e = Point.new(100, 100) },
+        .{ .p = .new(10, 10), .s = 0.5, .e = .new(5, 5) },
+        .{ .p = .new(10, 15), .s = 2, .e = .new(20, 30) },
+        .{ .p = .new(10, 10), .s = 10, .e = .new(100, 100) },
     };
 
     for (tests, 0..) |t, i| {
@@ -287,7 +293,12 @@ test "Point.scale returns expected results" {
         try std.testing.expectEqual(t.e, actual);
 
         if (false) {
-            std.debug.print("test {d}: {}.scale({d}) -> {}\n", .{ i, t.p, t.s, actual });
+            std.debug.print("test {d}: {}.scale({d}) -> {}\n", .{
+                i,
+                t.p,
+                t.s,
+                actual,
+            });
         }
     }
 }
@@ -368,19 +379,23 @@ test "Rect.contains returns expected results" {
         r: Rect,
         p: Point,
     }{
-        .{ .e = true, .r = Rect.new(0, 0, 10, 10), .p = Point.new(5, 5) },
-        .{ .e = true, .r = Rect.new(0, 0, 10, 10), .p = Point.new(5, 10) },
-        .{ .e = true, .r = Rect.new(0, 0, 10, 10), .p = Point.new(10, 10) },
-        .{ .e = false, .r = Rect.new(0, 0, 10, 10), .p = Point.new(15, 10) },
-        .{ .e = false, .r = Rect.new(10, 10, 10, 10), .p = Point.new(5, 5) },
-        .{ .e = true, .r = Rect.new(10, 10, 10, 10), .p = Point.new(15, 15) },
+        .{ .e = true, .r = .new(0, 0, 10, 10), .p = .new(5, 5) },
+        .{ .e = true, .r = .new(0, 0, 10, 10), .p = .new(5, 10) },
+        .{ .e = true, .r = .new(0, 0, 10, 10), .p = .new(10, 10) },
+        .{ .e = false, .r = .new(0, 0, 10, 10), .p = .new(15, 10) },
+        .{ .e = false, .r = .new(10, 10, 10, 10), .p = .new(5, 5) },
+        .{ .e = true, .r = .new(10, 10, 10, 10), .p = .new(15, 15) },
     };
 
     for (tests, 0..) |t, i| {
         try std.testing.expectEqual(t.e, t.r.contains(t.p));
 
         if (false) {
-            std.debug.print("test {d}: r.contains({}) != {}\n", .{ i, t.p, t.e });
+            std.debug.print("test {d}: r.contains({}) != {}\n", .{
+                i,
+                t.p,
+                t.e,
+            });
         }
     }
 }
@@ -689,7 +704,7 @@ pub const Peer = struct {
     id: u8,
 
     /// The combined Peer.
-    pub const combined = Peer{ .id = 0xFF };
+    pub const combined: Peer = .{ .id = 0xFF };
 
     /// Check if two Peers are the same.
     pub fn eq(self: Peer, other: Peer) bool {
@@ -713,7 +728,7 @@ pub const Peers = struct {
 
     /// Iterator for Peers.
     pub fn iter(self: Peers) PeersIter {
-        return PeersIter{ .peer = 0, .peers = self.peers };
+        return .{ .peer = 0, .peers = self.peers };
     }
 };
 
@@ -730,7 +745,7 @@ pub const PeersIter = struct {
             self.peer += 1;
             self.peers >>= 1;
             if (peers & 1 != 0) {
-                return Peer{ .id = peer };
+                return .{ .id = peer };
             }
         }
         return null;
@@ -943,7 +958,7 @@ pub fn readPad(p: Peer) ?Pad {
     if (raw == 0xffff) {
         return null;
     }
-    return Pad{
+    return .{
         .x = @intCast(@as(i16, @truncate(raw >> 16))),
         .y = @intCast(@as(i16, @truncate(raw & 0xFFFF))),
     };
@@ -952,7 +967,7 @@ pub fn readPad(p: Peer) ?Pad {
 /// Get the currently pressed buttons.
 pub fn readButtons(p: Peer) Buttons {
     const raw = bindings.read_buttons(p.id);
-    return Buttons{
+    return .{
         .s = raw & 1 != 0,
         .e = (raw >> 1) & 1 != 0,
         .w = (raw >> 2) & 1 != 0,
@@ -1063,12 +1078,12 @@ pub fn quit() void {
 /// Get the peer corresponding to the local device.
 pub fn getMe() Peer {
     const p = bindings.get_me();
-    return Peer{ .id = @truncate(p) };
+    return .{ .id = @truncate(p) };
 }
 
 /// Get the list of peers online.
 pub fn getPeers() Peers {
-    return Peers{ .peers = bindings.get_peers() };
+    return .{ .peers = bindings.get_peers() };
 }
 
 /// Save the [Stash](#ff.Stash)
@@ -1099,7 +1114,7 @@ pub fn getProgress(p: Peer, b: Badge) Progress {
 /// and the returned value is the lowest progress.
 pub fn addProgress(p: Peer, b: Badge, val: i32) Progress {
     const raw: i32 = @intCast(bindings.add_progress(p.id, b, val));
-    return Progress{
+    return .{
         .done = @intCast(@as(i16, @truncate(raw >> 16))),
         .goal = @intCast(@as(i16, @truncate(raw & 0xFFFF))),
     };
