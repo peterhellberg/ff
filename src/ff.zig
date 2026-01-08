@@ -657,12 +657,39 @@ pub const Palette = struct {
     }
 };
 
+/// Style describes how filled shapes are rendered.
+///
+/// It controls both the fill and the stroke (outline) of shapes such as
+/// rectangles, circles, triangles, arcs, and sectors.
+///
+/// ### Defaults
+/// - `fill_color = .none` → shape is not filled
+/// - `stroke_color = .none` → no outline is drawn
+/// - `stroke_width = 0` → outline is disabled
+///
+/// A shape can be:
+/// - **Filled only** (set `fill_color`)
+/// - **Stroked only** (set `stroke_color` and `stroke_width`)
+/// - **Filled and stroked**
+///
+/// Used by drawing functions like [`drawRect`](#ff.drawRect),
+/// [`drawCircle`](#ff.drawCircle), and others.
 pub const Style = struct {
     fill_color: Color = .none,
     stroke_color: Color = .none,
     stroke_width: i32 = 0,
 };
 
+/// LineStyle describes how lines are rendered.
+///
+/// It is a simplified style used specifically for line drawing
+/// (see [`drawLine`](#ff.drawLine)).
+///
+/// ### Defaults
+/// - `color = .none` → line is not drawn
+/// - `width = 1` → 1 pixel wide
+///
+/// The width is specified in screen pixels.
 pub const LineStyle = struct {
     color: Color = .none,
     width: i32 = 1,
@@ -675,16 +702,41 @@ pub const Canvas = Image;
 pub const String = []const u8;
 pub const Stash = []u8;
 
+/// SubImage represents a rectangular subregion of an image.
+///
+/// It is most commonly used to draw sprites from a sprite atlas
+/// using [`drawSubImage`](#ff.drawSubImage).
+///
+/// - `point` specifies the top-left corner of the subregion
+///   inside the source image.
+/// - `size` specifies the width and height of the subregion.
+/// - `raw` is the underlying image data buffer.
+///
+/// The coordinate system for `point` is relative to the source image,
+/// not the screen.
 pub const SubImage = struct {
     point: Point,
     size: Size,
     raw: []u8,
 };
 
+/// Pad represents the current analog touchpad or joystick state.
+///
+/// The `x` and `y` values describe the displacement from the center,
+/// in the range provided by the device hardware.
+///
+/// A Pad can be:
+/// - Converted into a [`DPad`](#ff.DPad) using [`toDPad`](#ff.Pad.toDPad)
+/// - Measured for distance from center using [`radius`](#ff.Pad.radius)
+/// - Converted to an angle using [`azimuth`](#ff.Pad.azimuth)
 pub const Pad = struct {
     x: i32,
     y: i32,
 
+    /// Convert the analog pad input into a digital DPad.
+    ///
+    /// Directions are considered pressed if their axis exceeds
+    /// the internal threshold.
     pub fn toDPad(self: Pad) DPad {
         return .{
             .left = self.x <= -dpad_threshold,
@@ -694,6 +746,9 @@ pub const Pad = struct {
         };
     }
 
+    /// Return the distance from the center of the pad.
+    ///
+    /// This is useful for detecting how strongly the pad is engaged.
     pub fn radius(self: Pad) f32 {
         return std.math.sqrt(
             @as(f32, @floatFromInt(
@@ -702,6 +757,10 @@ pub const Pad = struct {
         );
     }
 
+    /// Return the angle of the pad direction.
+    ///
+    /// The angle is measured in radians, using `atan2(y, x)`,
+    /// and is returned as an [`Angle`](#ff.Angle).
     pub fn azimuth(self: Pad) Angle {
         return .{
             .radians = std.math.atan2(
@@ -712,16 +771,26 @@ pub const Pad = struct {
     }
 };
 
+/// DPad represents a digital directional input state.
+///
+/// Each field indicates whether the corresponding direction
+/// is currently pressed.
+///
+/// DPad values are commonly derived from an analog [`Pad`](#ff.Pad).
 pub const DPad = struct {
     left: bool,
     right: bool,
     up: bool,
     down: bool,
 
+    /// Return true if any direction is pressed.
     pub fn any(self: DPad) bool {
         return self.left or self.right or self.up or self.down;
     }
 
+    /// Return directions that were pressed this frame.
+    ///
+    /// `prev` must be the DPad state from the previous frame.
     pub fn justPressed(self: DPad, prev: DPad) DPad {
         return .{
             .left = self.left and !prev.left,
@@ -731,6 +800,9 @@ pub const DPad = struct {
         };
     }
 
+    /// Return directions that were released this frame.
+    ///
+    /// `prev` must be the DPad state from the previous frame.
     pub fn justReleased(self: DPad, prev: DPad) DPad {
         return .{
             .left = !self.left and prev.left,
@@ -740,6 +812,10 @@ pub const DPad = struct {
         };
     }
 
+    /// Return directions that are being held down.
+    ///
+    /// A direction is considered held if it was pressed
+    /// in both the current and previous frame.
     pub fn held(self: DPad, prev: DPad) DPad {
         return .{
             .left = self.left and prev.left,
