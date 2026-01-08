@@ -1,6 +1,6 @@
 .{
     .name = .ff,
-    .version = "0.1.6",
+    .version = "0.1.7",
     .fingerprint = 0xd6af1ab3b46f6e76,
     .paths = .{
         "src",
