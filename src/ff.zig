@@ -123,6 +123,9 @@ const pi: f32 = 3.14159265358979323846264338327950288;
 /// An approximation of the mathematical constant τ.
 const tau: f32 = 6.28318530717958647692528676655900577;
 
+/// Threshold for the DPad
+const dpad_threshold: i32 = 100;
+
 /// Vec is a `@Vector(2, f32)`
 pub const Vec = @Vector(2, f32);
 
@@ -681,6 +684,70 @@ pub const SubImage = struct {
 pub const Pad = struct {
     x: i32,
     y: i32,
+
+    pub fn toDPad(self: Pad) DPad {
+        return .{
+            .left = self.x <= -dpad_threshold,
+            .right = self.x >= dpad_threshold,
+            .up = self.y >= dpad_threshold,
+            .down = self.y <= -dpad_threshold,
+        };
+    }
+
+    pub fn radius(self: Pad) f32 {
+        return std.math.sqrt(
+            @as(f32, @floatFromInt(
+                self.x * self.x + self.y * self.y,
+            )),
+        );
+    }
+
+    pub fn azimuth(self: Pad) Angle {
+        return .{
+            .radians = std.math.atan2(
+                @as(f32, @floatFromInt(self.y)),
+                @as(f32, @floatFromInt(self.x)),
+            ),
+        };
+    }
+};
+
+pub const DPad = struct {
+    left: bool,
+    right: bool,
+    up: bool,
+    down: bool,
+
+    pub fn any(self: DPad) bool {
+        return self.left or self.right or self.up or self.down;
+    }
+
+    pub fn justPressed(self: DPad, prev: DPad) DPad {
+        return .{
+            .left = self.left and !prev.left,
+            .right = self.right and !prev.right,
+            .up = self.up and !prev.up,
+            .down = self.down and !prev.down,
+        };
+    }
+
+    pub fn justReleased(self: DPad, prev: DPad) DPad {
+        return .{
+            .left = !self.left and prev.left,
+            .right = !self.right and prev.right,
+            .up = !self.up and prev.up,
+            .down = !self.down and prev.down,
+        };
+    }
+
+    pub fn held(self: DPad, prev: DPad) DPad {
+        return .{
+            .left = self.left and prev.left,
+            .right = self.right and prev.right,
+            .up = self.up and prev.up,
+            .down = self.down and prev.down,
+        };
+    }
 };
 
 /// Buttons represent the current button state for [Peer](#ff.Peer) (such as [me](#ff.getMe)).
