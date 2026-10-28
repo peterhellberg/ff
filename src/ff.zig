@@ -552,7 +552,7 @@ pub const Color = enum(i32) {
 
     /// num returns the Color for the given n.
     pub fn num(n: i32) Color {
-        return @enumFromInt(n);
+        return @fromBackingInt(@intCast(n));
     }
 
     /// screen clear the screen with the Color.
@@ -572,22 +572,22 @@ pub const Color = enum(i32) {
 
     /// prev Color before self.
     pub fn prev(self: Color) Color {
-        const n: i32 = @intFromEnum(self);
+        const n: i32 = @backingInt(self);
 
         if (n <= 0) return .none;
         if (n == 1) return .dark_gray;
 
-        return @enumFromInt(n - 1);
+        return @fromBackingInt(@intCast(n - 1));
     }
 
     /// next Color after self.
     pub fn next(self: Color) Color {
-        const n: i32 = @intFromEnum(self);
+        const n: i32 = @backingInt(self);
 
         if (n <= 0) return .none;
         if (n > 15) return .black;
 
-        return @enumFromInt(n + 1);
+        return @fromBackingInt(@intCast(n + 1));
     }
 };
 
@@ -915,12 +915,12 @@ pub const Progress = struct {
 
 /// Fill the whole frame with the given color.
 pub fn clearScreen(c: Color) void {
-    bindings.clear_screen(@intFromEnum(c));
+    bindings.clear_screen(@backingInt(c));
 }
 
 /// Set a color value in the palette.
 pub fn setColor(c: Color, v: RGB) void {
-    bindings.set_color(@intFromEnum(c), v.r, v.g, v.b);
+    bindings.set_color(@backingInt(c), v.r, v.g, v.b);
 }
 
 /// Set a color value in the palette, using a hexadecimal value.
@@ -930,12 +930,12 @@ pub fn setColorHex(c: Color, hex: u32) void {
 
 /// Set a single point (1 pixel is scaling is 1) on the frame.
 pub fn drawPoint(p: Point, c: Color) void {
-    bindings.draw_point(p.x, p.y, @intFromEnum(c));
+    bindings.draw_point(p.x, p.y, @backingInt(c));
 }
 
 /// Draw a straight line from point a to point b.
 pub fn drawLine(a: Point, b: Point, s: LineStyle) void {
-    bindings.draw_line(a.x, a.y, b.x, b.y, @intFromEnum(s.color), s.width);
+    bindings.draw_line(a.x, a.y, b.x, b.y, @backingInt(s.color), s.width);
 }
 
 /// Draw a rectangle filling the given bounding box.
@@ -945,8 +945,8 @@ pub fn drawRect(p: Point, b: Size, s: Style) void {
         p.y,
         b.width,
         b.height,
-        @intFromEnum(s.fill_color),
-        @intFromEnum(s.stroke_color),
+        @backingInt(s.fill_color),
+        @backingInt(s.stroke_color),
         s.stroke_width,
     );
 }
@@ -960,8 +960,8 @@ pub fn drawRoundedRect(p: Point, b: Size, corner: Size, s: Style) void {
         b.height,
         corner.width,
         corner.height,
-        @intFromEnum(s.fill_color),
-        @intFromEnum(s.stroke_color),
+        @backingInt(s.fill_color),
+        @backingInt(s.stroke_color),
         s.stroke_width,
     );
 }
@@ -972,8 +972,8 @@ pub fn drawCircle(p: Point, d: i32, s: Style) void {
         p.x,
         p.y,
         d,
-        @intFromEnum(s.fill_color),
-        @intFromEnum(s.stroke_color),
+        @backingInt(s.fill_color),
+        @backingInt(s.stroke_color),
         s.stroke_width,
     );
 }
@@ -985,8 +985,8 @@ pub fn drawEllipse(p: Point, b: Size, s: Style) void {
         p.y,
         b.width,
         b.height,
-        @intFromEnum(s.fill_color),
-        @intFromEnum(s.stroke_color),
+        @backingInt(s.fill_color),
+        @backingInt(s.stroke_color),
         s.stroke_width,
     );
 }
@@ -1002,8 +1002,8 @@ pub fn drawTriangle(a: Point, b: Point, c: Point, s: Style) void {
         b.y,
         c.x,
         c.y,
-        @intFromEnum(s.fill_color),
-        @intFromEnum(s.stroke_color),
+        @backingInt(s.fill_color),
+        @backingInt(s.stroke_color),
         s.stroke_width,
     );
 }
@@ -1016,8 +1016,8 @@ pub fn drawArc(p: Point, d: i32, start: Angle, sweep: Angle, s: Style) void {
         d,
         start.radians,
         sweep.radians,
-        @intFromEnum(s.fill_color),
-        @intFromEnum(s.stroke_color),
+        @backingInt(s.fill_color),
+        @backingInt(s.stroke_color),
         s.stroke_width,
     );
 }
@@ -1030,8 +1030,8 @@ pub fn drawSector(p: Point, d: i32, start: Angle, sweep: Angle, s: Style) void {
         d,
         start.radians,
         sweep.radians,
-        @intFromEnum(s.fill_color),
-        @intFromEnum(s.stroke_color),
+        @backingInt(s.fill_color),
+        @backingInt(s.stroke_color),
         s.stroke_width,
     );
 }
@@ -1048,7 +1048,7 @@ pub fn drawText(t: String, f: Font, p: Point, c: Color) void {
         f.len,
         p.x,
         p.y,
-        @intFromEnum(c),
+        @backingInt(c),
     );
 }
 
@@ -1059,8 +1059,8 @@ pub fn drawQR(t: String, p: Point, black: Color, white: Color) void {
         t.len,
         p.x,
         p.y,
-        @intFromEnum(black),
-        @intFromEnum(white),
+        @backingInt(black),
+        @backingInt(white),
     );
 }
 
