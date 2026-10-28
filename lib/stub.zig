@@ -28,6 +28,10 @@ export fn get_random() u32 {
     return 4;
 }
 
+export fn get_time() u64 {
+    return 42;
+}
+
 export fn load_file() void {}
 export fn load_stash() void {}
 export fn log_debug() void {}

@@ -1213,6 +1213,17 @@ test "getRandom returns values" {
     try std.testing.expectEqual(a + b + c, 12); // Stub always returns 4
 }
 
+/// Get the current time since start
+pub fn getTime() u64 {
+    return bindings.get_time();
+}
+
+test "getTime returns value" {
+    const t = getTime();
+
+    try std.testing.expectEqual(t, 42); // Stub always returns 42
+}
+
 /// Exit the app after the current update is finished.
 pub fn quit() void {
     bindings.quit();
