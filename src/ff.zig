@@ -476,6 +476,11 @@ pub const RGB = struct {
     }
 };
 
+test "RGB.from_hex unpacks channels" {
+    try std.testing.expectEqual(RGB{ .r = 0x12, .g = 0x34, .b = 0x56 }, RGB.from_hex(0x123456));
+    try std.testing.expectEqual(RGB{ .r = 0, .g = 0, .b = 0 }, RGB.from_hex(0));
+}
+
 /// Color **`enum`** which is used to refer to
 /// each color in the [Palette](#ff.Palette),
 /// including `.none` which is transparent.
@@ -826,6 +831,23 @@ pub const DPad = struct {
     }
 };
 
+test "Pad.toDPad applies the threshold" {
+    try std.testing.expectEqual(DPad{ .left = false, .right = false, .up = false, .down = false }, (Pad{ .x = 0, .y = 0 }).toDPad());
+    try std.testing.expectEqual(DPad{ .left = true, .right = false, .up = false, .down = false }, (Pad{ .x = -100, .y = 0 }).toDPad());
+    try std.testing.expectEqual(DPad{ .left = false, .right = true, .up = true, .down = false }, (Pad{ .x = 100, .y = 100 }).toDPad());
+    try std.testing.expectEqual(DPad{ .left = false, .right = false, .up = false, .down = true }, (Pad{ .x = 0, .y = -100 }).toDPad());
+}
+
+test "DPad transitions" {
+    const prev = DPad{ .left = true, .right = false, .up = true, .down = false };
+    const now = DPad{ .left = false, .right = true, .up = true, .down = true };
+
+    try std.testing.expect(now.any());
+    try std.testing.expectEqual(DPad{ .left = false, .right = true, .up = false, .down = true }, now.justPressed(prev));
+    try std.testing.expectEqual(DPad{ .left = true, .right = false, .up = false, .down = false }, now.justReleased(prev));
+    try std.testing.expectEqual(DPad{ .left = false, .right = false, .up = true, .down = false }, now.held(prev));
+}
+
 /// Buttons represent the current button state for [Peer](#ff.Peer) (such as [me](#ff.getMe)).
 pub const Buttons = struct {
     /// South button
@@ -861,7 +883,8 @@ pub const Peers = struct {
 
     /// Check if the Peers contain the given Peer.
     pub fn contains(self: Peers, p: Peer) bool {
-        return (self.peers >> p.id) & 1 != 0;
+        if (p.id > 31) return false;
+        return (self.peers >> @intCast(p.id)) & 1 != 0;
     }
 
     /// Return how many Peers there currently are.
@@ -895,6 +918,23 @@ pub const PeersIter = struct {
     }
 };
 
+test "Peers contains, len, and iter" {
+    const peers = Peers{ .peers = 0b1011 };
+
+    try std.testing.expect(peers.contains(.{ .id = 0 }));
+    try std.testing.expect(peers.contains(.{ .id = 1 }));
+    try std.testing.expect(!peers.contains(.{ .id = 2 }));
+    try std.testing.expect(peers.contains(.{ .id = 3 }));
+    try std.testing.expect(!peers.contains(Peer.combined));
+    try std.testing.expectEqual(@as(u32, 3), peers.len());
+
+    var iter = peers.iter();
+    try std.testing.expectEqual(@as(u8, 0), iter.next().?.id);
+    try std.testing.expectEqual(@as(u8, 1), iter.next().?.id);
+    try std.testing.expectEqual(@as(u8, 3), iter.next().?.id);
+    try std.testing.expect(iter.next() == null);
+}
+
 /// A Badge are an achievement that the game rewards to the player for doing some action.
 pub const Badge = u8;
 
@@ -912,6 +952,12 @@ pub const Progress = struct {
         return self.done >= self.goal;
     }
 };
+
+test "Progress.earned" {
+    try std.testing.expect(!(Progress{ .done = 2, .goal = 4 }).earned());
+    try std.testing.expect((Progress{ .done = 4, .goal = 4 }).earned());
+    try std.testing.expect((Progress{ .done = 5, .goal = 4 }).earned());
+}
 
 /// Fill the whole frame with the given color.
 pub fn clearScreen(c: Color) void {
