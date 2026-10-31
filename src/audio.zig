@@ -595,3 +595,25 @@ pub const Zero = Node;
 pub const File = Node;
 
 pub const out: BaseNode = .{ .id = 0 };
+
+test "Modulator covers every variant" {
+    const t = Time.zero;
+    const mods = [_]Modulator{
+        .{ .linear = .{ .start = 0, .end = 1, .start_at = t, .end_at = t } },
+        .{ .hold = .{ .before = 0, .after = 1, .time = t } },
+        .{ .sine = .{ .f = Freq.hz(440), .low = 0, .high = 1 } },
+        .{ .square = .{ .period = t, .low = 0, .high = 1 } },
+        .{ .sawtooth = .{ .period = t, .low = 0, .high = 1 } },
+        .{ .adsr = .{
+            .attack = t,
+            .decay = t,
+            .sustain = t,
+            .sustain_level = 1,
+            .release = t,
+            .low = 0,
+            .high = 1,
+        } },
+    };
+
+    for (mods) |m| m.modulate(0, 0);
+}
