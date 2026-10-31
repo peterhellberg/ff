@@ -350,6 +350,10 @@ fn NodeMixin(comptime T: type) type {
         pub fn clear(self: *const Self) void {
             bindings.clear(self.parentId());
         }
+
+        pub fn setParam(self: *const Self, param: u32, val: f32) void {
+            bindings.set_param(self.parentId(), param, val);
+        }
     };
 }
 
@@ -401,10 +405,65 @@ pub const SineModulator = struct {
     }
 };
 
+/// Square wave low-frequency oscillator.
+pub const SquareModulator = struct {
+    period: Time,
+    low: f32,
+    high: f32,
+
+    fn modulate(self: SquareModulator, node_id: u32, param: u32) void {
+        bindings.mod_square(node_id, param, self.low, self.high, self.period.s);
+    }
+};
+
+/// Sawtooth wave low-frequency oscillator.
+pub const SawtoothModulator = struct {
+    period: Time,
+    low: f32,
+    high: f32,
+
+    fn modulate(self: SawtoothModulator, node_id: u32, param: u32) void {
+        bindings.mod_sawtooth(node_id, param, self.low, self.high, self.period.s);
+    }
+};
+
+/// ADSR envelope.
+///
+/// 1. Until `attack`, the value goes from 0 to 1.
+/// 2. Until `decay`, it goes from 1 to `sustain_level`.
+/// 3. Until `sustain`, it holds `sustain_level`.
+/// 4. Until `release`, it goes from `sustain_level` to 0.
+pub const ADSRModulator = struct {
+    attack: Time,
+    decay: Time,
+    sustain: Time,
+    sustain_level: f32,
+    release: Time,
+    low: f32,
+    high: f32,
+
+    fn modulate(self: ADSRModulator, node_id: u32, param: u32) void {
+        bindings.mod_adsr(
+            node_id,
+            param,
+            self.low,
+            self.high,
+            self.attack.s,
+            self.decay.s,
+            self.sustain.s,
+            self.sustain_level,
+            self.release.s,
+        );
+    }
+};
+
 pub const Modulator = union(enum) {
     linear: LinearModulator,
     hold: HoldModulator,
     sine: SineModulator,
+    square: SquareModulator,
+    sawtooth: SawtoothModulator,
+    adsr: ADSRModulator,
 
     fn modulate(self: Modulator, node_id: u32, param: u32) void {
         switch (self) {
