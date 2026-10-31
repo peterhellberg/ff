@@ -1,5 +1,6 @@
 //! Audio functionality for **ff**
 
+const std = @import("std");
 const bindings = @import("bindings.zig").audio;
 
 pub const sample_rate: u32 = 44_100;
@@ -163,7 +164,7 @@ pub const Freq = struct {
             else => 15.43,
         };
         const oct = note / 12;
-        f *= @floatFromInt(1 << oct);
+        f *= @floatFromInt(@as(u32, 1) << @intCast(oct));
         return .{ .h = f };
     }
 };
@@ -182,9 +183,17 @@ pub const Time = struct {
     }
 
     pub fn ms(s: u32) Time {
-        return .{ .s = s * sample_rate / 1000 };
+        return .{ .s = @intCast(@as(u64, s) * sample_rate / 1000) };
     }
 };
+
+test "Freq.midi and Time conversions" {
+    try std.testing.expectEqual(@as(f32, 8.1758), Freq.midi(0).h);
+    try std.testing.expectEqual(@as(f32, 440.0), Freq.midi(69).h);
+    try std.testing.expectEqual(@as(u32, 44100), Time.seconds(1).s);
+    try std.testing.expectEqual(@as(u32, 441), Time.ms(10).s);
+    try std.testing.expectEqual(@as(u32, 4_410_000), Time.ms(100_000).s);
+}
 
 fn NodeMixin(comptime T: type) type {
     return struct {
