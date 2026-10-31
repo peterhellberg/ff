@@ -162,3 +162,12 @@ export fn mod_sine() void {}
 export fn mod_square() void {}
 export fn mod_sawtooth() void {}
 export fn mod_adsr() void {}
+
+// sudo
+export fn list_dirs() u32 {
+    return 0;
+}
+export fn list_dirs_buf_size() u32 {
+    return 0;
+}
+export fn run_app() void {}
