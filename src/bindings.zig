@@ -1,4 +1,6 @@
 pub extern "graphics" fn clear_screen(color: i32) void;
+pub extern "graphics" fn flip_x() void;
+pub extern "graphics" fn flip_y() void;
 pub extern "graphics" fn set_color(index: i32, r: i32, g: i32, b: i32) void;
 pub extern "graphics" fn draw_point(x: i32, y: i32, color: i32) void;
 pub extern "graphics" fn draw_line(
@@ -104,6 +106,30 @@ pub extern "graphics" fn draw_sub_image(
     sub_width: i32,
     sub_height: i32,
 ) void;
+pub extern "graphics" fn draw_sub_tile(
+    ptr: u32,
+    len: u32,
+    x: i32,
+    y: i32,
+    w: i32,
+    h: i32,
+    sub_x: i32,
+    sub_y: i32,
+    sub_width: i32,
+    sub_height: i32,
+) void;
+pub extern "graphics" fn draw_nine_slice(
+    ptr: u32,
+    len: u32,
+    x: i32,
+    y: i32,
+    w: i32,
+    h: i32,
+    mid_x: i32,
+    mid_y: i32,
+    mid_width: i32,
+    mid_height: i32,
+) void;
 pub extern "graphics" fn draw_image(ptr: u32, len: u32, x: i32, y: i32) void;
 pub extern "graphics" fn set_canvas(ptr: u32, len: u32) void;
 pub extern "graphics" fn unset_canvas() void;
@@ -125,6 +151,7 @@ pub extern "misc" fn log_error(ptr: u32, len: u32) void;
 pub extern "misc" fn set_seed(seed: u32) void;
 pub extern "misc" fn get_random() u32;
 pub extern "misc" fn get_time() u64;
+pub extern "misc" fn get_settings(peer: u32) u64;
 pub extern "misc" fn quit() void;
 
 pub extern "net" fn get_me() u32;
@@ -174,8 +201,12 @@ pub const audio = struct {
     pub extern "audio" fn reset(node_id: u32) void;
     pub extern "audio" fn reset_all(node_id: u32) void;
     pub extern "audio" fn clear(node_id: u32) void;
+    pub extern "audio" fn set_param(node_id: u32, param: u32, val: f32) void;
 
-    pub extern "audio" fn mod_linear(node_id: u32, param: u32, start: f32, end: f32, start_at: u32, end_at: u32) void;
-    pub extern "audio" fn mod_hold(node_id: u32, param: u32, v1: f32, v2: f32, time: u32) void;
+    pub extern "audio" fn mod_linear(node_id: u32, param: u32, low: f32, high: f32, start_at: u32, end_at: u32) void;
+    pub extern "audio" fn mod_hold(node_id: u32, param: u32, low: f32, high: f32, time: u32) void;
     pub extern "audio" fn mod_sine(node_id: u32, param: u32, freq: f32, low: f32, high: f32) void;
+    pub extern "audio" fn mod_square(id: u32, param: u32, low: f32, high: f32, period: u32) void;
+    pub extern "audio" fn mod_sawtooth(id: u32, param: u32, low: f32, high: f32, period: u32) void;
+    pub extern "audio" fn mod_adsr(id: u32, param: u32, low: f32, high: f32, attack: u32, decay: u32, sustain: u32, sustain_level: f32, release: u32) void;
 };
