@@ -105,7 +105,7 @@ comptime {
 
 const bindings = @import("bindings.zig");
 
-// Audio functions
+/// Audio functions
 pub const audio = @import("audio.zig");
 
 /// Drawing functions
@@ -404,8 +404,8 @@ test "Rect.contains returns expected results" {
 }
 
 /// Angle of something,
-/// can be created [from_degrees](#ff.Angle.from_degrees)
-/// and [from_radians](#ff.Angle.from_radians)
+/// can be created [fromDegrees](#ff.Angle.fromDegrees)
+/// and [fromRadians](#ff.Angle.fromRadians)
 pub const Angle = struct {
     radians: f32 = 0,
 
@@ -641,7 +641,7 @@ pub const Palette = struct {
     gray: u32 = 0x566C86,
     dark_gray: u32 = 0x333C57,
 
-    // set each Color based on the Palette.
+    /// Set each color in the palette.
     pub fn set(self: Palette) void {
         setColorHex(.black, self.black);
         setColorHex(.purple, self.purple);
@@ -700,11 +700,17 @@ pub const LineStyle = struct {
     width: i32 = 1,
 };
 
+/// A file loaded into memory.
 pub const File = []u8;
+/// A font file.
 pub const Font = File;
+/// An image file.
 pub const Image = File;
+/// An image used as a drawing target.
 pub const Canvas = Image;
+/// A UTF-8 string.
 pub const String = []const u8;
+/// Serialized application state.
 pub const Stash = []u8;
 
 /// SubImage represents a rectangular subregion of an image.
@@ -941,13 +947,14 @@ pub const Badge = u8;
 /// A Board (aka scoreboard or leaderboard) keep track of best scores of the player and their friends.
 pub const Board = u8;
 
+/// Progress towards earning a [`Badge`](#ff.Badge).
 pub const Progress = struct {
     /// How many points the player already has.
     done: u16,
     /// How many points the player needs to earn the badge.
     goal: u16,
 
-    // Check if Progress has been earned or not.
+    /// Check if the progress has been earned.
     pub fn earned(self: Progress) bool {
         return self.done >= self.goal;
     }
@@ -1179,7 +1186,7 @@ pub fn setCanvas(c: Canvas) void {
     bindings.set_canvas(@intFromPtr(c.ptr), c.len);
 }
 
-/// Unset canvas set by [`set_canvas`]. All subsequent drawing operations will target frame buffer.
+/// Unset the canvas set by [`setCanvas`](#ff.setCanvas). All subsequent drawing operations will target the frame buffer.
 pub fn unsetCanvas() void {
     bindings.unset_canvas();
 }
