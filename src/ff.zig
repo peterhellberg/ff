@@ -918,6 +918,16 @@ pub fn clearScreen(c: Color) void {
     bindings.clear_screen(@backingInt(c));
 }
 
+/// Flip the current render target (screen or canvas) horizontally.
+pub fn flipX() void {
+    bindings.flip_x();
+}
+
+/// Flip the current render target (screen or canvas) vertically.
+pub fn flipY() void {
+    bindings.flip_y();
+}
+
 /// Set a color value in the palette.
 pub fn setColor(c: Color, v: RGB) void {
     bindings.set_color(@backingInt(c), v.r, v.g, v.b);
@@ -1085,6 +1095,39 @@ pub fn drawSubImage(i: SubImage, p: Point) void {
     );
 }
 
+/// Tile the given screen area with the provided subimage.
+pub fn drawSubTile(i: SubImage, p: Point, s: Size) void {
+    bindings.draw_sub_tile(
+        @intFromPtr(i.raw.ptr),
+        i.raw.len,
+        p.x,
+        p.y,
+        s.width,
+        s.height,
+        i.point.x,
+        i.point.y,
+        i.size.width,
+        i.size.height,
+    );
+}
+
+/// Fill the given area with a 9-slice.
+/// `i.raw` is the whole image; `i.point`/`i.size` describe its middle segment.
+pub fn drawNineSlice(i: SubImage, p: Point, s: Size) void {
+    bindings.draw_nine_slice(
+        @intFromPtr(i.raw.ptr),
+        i.raw.len,
+        p.x,
+        p.y,
+        s.width,
+        s.height,
+        i.point.x,
+        i.point.y,
+        i.size.width,
+        i.size.height,
+    );
+}
+
 /// Set canvas to be used for all subsequent drawing operations.
 pub fn setCanvas(c: Canvas) void {
     bindings.set_canvas(@intFromPtr(c.ptr), c.len);
@@ -1222,6 +1265,136 @@ test "getTime returns value" {
     const t = getTime();
 
     try std.testing.expectEqual(t, 42); // Stub always returns 42
+}
+
+/// Interface language code, stored as the two ASCII bytes ("en", "nl", ...).
+pub const Language = enum(u16) {
+    /// en
+    english = 0x656e,
+    /// nl
+    dutch = 0x6e6c,
+    /// fr
+    french = 0x6672,
+    /// de
+    german = 0x6465,
+    /// it
+    italian = 0x6974,
+    /// pl
+    polish = 0x706c,
+    /// ro
+    romanian = 0x726f,
+    /// ru
+    russian = 0x7275,
+    /// es
+    spanish = 0x6573,
+    /// sv
+    swedish = 0x7376,
+    /// tr
+    turkish = 0x7472,
+    /// uk
+    ukrainian = 0x756b,
+    /// tp
+    toki_pona = 0x7470,
+};
+
+/// Color scheme preferred by the player.
+///
+/// The colors are palette indices, so they can be passed directly to any
+/// function that accepts a [`Color`](#ff.Color).
+pub const Theme = struct {
+    /// Identifier of the theme.
+    ///
+    /// Useful for comparing themes or selecting a bundled theme;
+    /// it is not used for rendering.
+    id: u8,
+    /// The main color of text and boxes.
+    primary: Color,
+    /// The color of disabled options, muted text, etc.
+    secondary: Color,
+    /// The color of important elements, active options, etc.
+    accent: Color,
+    /// The background color, the color with the most contrast to `primary`.
+    bg: Color,
+};
+
+/// System settings configured by the player.
+///
+/// Obtained using [`getSettings`](#ff.getSettings). The app should respect
+/// these preferences, for example by rotating the screen when
+/// `rotate_screen` is set, or by avoiding rapid flashes when
+/// `reduce_flashing` is set.
+pub const Settings = struct {
+    /// The preferred color scheme of the player.
+    theme: Theme,
+    /// The configured interface language.
+    language: Language,
+    /// If true, the screen is rotated 180 degrees.
+    ///
+    /// In other words, the player holds the device upside-down.
+    /// The touchpad is now on the right and the buttons are on the left.
+    rotate_screen: bool,
+    /// The player has photosensitivity.
+    ///
+    /// The app should avoid any rapid flashes.
+    reduce_flashing: bool,
+    /// The player wants increased contrast for colors.
+    ///
+    /// If set, the black and white colors in the default palette are adjusted
+    /// automatically. All other colors in the default palette, or all colors
+    /// in a custom palette, should be adjusted by the app.
+    contrast: bool,
+    /// If true, the player wants to see easter eggs, holiday effects, and weird jokes.
+    easter_eggs: bool,
+};
+
+/// Get the system settings of the given peer.
+///
+/// Unlike [`readPad`](#ff.readPad) and [`readButtons`](#ff.readButtons), this
+/// accepts any peer, including the one returned by [`getMe`](#ff.getMe).
+///
+/// [`Peer.combined`](#ff.Peer.combined) has no settings of its own, so pass a
+/// real peer rather than the combined one.
+///
+/// See the [networking docs](https://docs.fireflyzero.com/dev/net/) for more
+/// information about peer identity and why mixing peers between devices can
+/// cause state drift in multiplayer.
+pub fn getSettings(p: Peer) Settings {
+    const raw = bindings.get_settings(p.id);
+    const flags = raw >> 16;
+    const theme_raw = raw >> 32;
+    return .{
+        .theme = .{
+            .id = @truncate(theme_raw),
+            .primary = Color.num(@intCast((theme_raw >> 20 & 0xf) + 1)),
+            .secondary = Color.num(@intCast((theme_raw >> 16 & 0xf) + 1)),
+            .accent = Color.num(@intCast((theme_raw >> 12 & 0xf) + 1)),
+            .bg = Color.num(@intCast((theme_raw >> 8 & 0xf) + 1)),
+        },
+        .language = @fromBackingInt(@intCast(@as(u16, @truncate(raw)))),
+        .rotate_screen = flags & 1 != 0,
+        .reduce_flashing = flags & 2 != 0,
+        .contrast = flags & 4 != 0,
+        .easter_eggs = flags & 8 != 0,
+    };
+}
+
+test "getSettings decodes packed settings" {
+    const actual = getSettings(.{ .id = 1 });
+
+    try std.testing.expectEqual(Settings{
+        .theme = .{
+            .id = 7,
+            .primary = .yellow,
+            .secondary = .orange,
+            .accent = .red,
+            .bg = .purple,
+        },
+        .language = .english,
+        .rotate_screen = true,
+        .reduce_flashing = true,
+        .contrast = false,
+        .easter_eggs = false,
+    }, actual);
 }
 
 /// Exit the app after the current update is finished.
