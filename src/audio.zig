@@ -486,6 +486,10 @@ pub const Sine = struct {
     pub fn modulate(self: Sine, mod: Modulator) void {
         mod.modulate(self.id, 0);
     }
+    /// Set oscillation frequency.
+    pub fn set(self: Sine, f: Freq) void {
+        self.node.setParam(0, f.h);
+    }
 };
 pub const Mix = Node;
 pub const AllForOne = Node;
@@ -495,6 +499,10 @@ pub const Gain = struct {
     /// Modulate the gain level.
     pub fn modulate(self: Gain, mod: Modulator) void {
         mod.modulate(self.id, 0);
+    }
+    /// Set the gain level.
+    pub fn set(self: Gain, val: f32) void {
+        self.node.setParam(0, val);
     }
 };
 pub const Loop = Node;
@@ -506,6 +514,10 @@ pub const Pan = struct {
     pub fn modulate(self: Pan, mod: Modulator) void {
         mod.modulate(self.id, 0);
     }
+    /// Set the pan value (from 0. to 1.: 0. is only left, 1. is only right).
+    pub fn set(self: Pan, val: f32) void {
+        self.node.setParam(0, val);
+    }
 };
 pub const Mute = struct {
     id: u32,
@@ -515,6 +527,14 @@ pub const Mute = struct {
     /// Below 0.5 is muted, above is unmuted.
     pub fn modulate(self: Mute, mod: Modulator) void {
         mod.modulate(self.id, 0);
+    }
+    /// Mute the node.
+    pub fn mute(self: Mute) void {
+        self.node.setParam(0, 0);
+    }
+    /// Unmute the node.
+    pub fn unmute(self: Mute) void {
+        self.node.setParam(0, 1);
     }
 };
 pub const Pause = struct {
@@ -526,6 +546,14 @@ pub const Pause = struct {
     pub fn modulate(self: Pause, mod: Modulator) void {
         mod.modulate(self.id, 0);
     }
+    /// Pause the node.
+    pub fn pause(self: Pause) void {
+        self.node.setParam(0, 0);
+    }
+    /// Resume playback of the node.
+    pub fn play(self: Pause) void {
+        self.node.setParam(0, 1);
+    }
 };
 pub const TrackPosition = Node;
 pub const LowPass = struct {
@@ -535,6 +563,10 @@ pub const LowPass = struct {
     pub fn modulate_freq(self: LowPass, mod: Modulator) void {
         mod.modulate(self.id, 0);
     }
+    /// Set the cut-off frequency.
+    pub fn setFreq(self: LowPass, f: Freq) void {
+        self.node.setParam(0, f.h);
+    }
 };
 pub const HighPass = struct {
     id: u32,
@@ -542,6 +574,10 @@ pub const HighPass = struct {
     /// Modulate the cut-off frequency.
     pub fn modulate_freq(self: HighPass, mod: Modulator) void {
         mod.modulate(self.id, 0);
+    }
+    /// Set the cut-off frequency.
+    pub fn setFreq(self: HighPass, f: Freq) void {
+        self.node.setParam(0, f.h);
     }
 };
 pub const TakeLeft = Node;
@@ -564,6 +600,20 @@ pub const Clip = struct {
     pub fn modulate_high(self: Clip, mod: Modulator) void {
         mod.modulate(self.id, 2);
     }
+    /// Set the low cut amplitude and adjust the high amplitude to keep the gap.
+    ///
+    /// In other words, the difference between low and high cut points will stay the same.
+    pub fn setBoth(self: Clip, val: f32) void {
+        self.node.setParam(0, val);
+    }
+    /// Set the low cut amplitude.
+    pub fn setLow(self: Clip, val: f32) void {
+        self.node.setParam(1, val);
+    }
+    /// Set the high cut amplitude.
+    pub fn setHigh(self: Clip, val: f32) void {
+        self.node.setParam(2, val);
+    }
 };
 pub const Square = struct {
     id: u32,
@@ -571,6 +621,10 @@ pub const Square = struct {
     /// Modulate oscillation frequency.
     pub fn modulate(self: Square, mod: Modulator) void {
         mod.modulate(self.id, 0);
+    }
+    /// Set oscillation frequency.
+    pub fn set(self: Square, f: Freq) void {
+        self.node.setParam(0, f.h);
     }
 };
 pub const Sawtooth = struct {
@@ -580,6 +634,10 @@ pub const Sawtooth = struct {
     pub fn modulate(self: Sawtooth, mod: Modulator) void {
         mod.modulate(self.id, 0);
     }
+    /// Set oscillation frequency.
+    pub fn set(self: Sawtooth, f: Freq) void {
+        self.node.setParam(0, f.h);
+    }
 };
 pub const Triangle = struct {
     id: u32,
@@ -588,11 +646,22 @@ pub const Triangle = struct {
     pub fn modulate(self: Triangle, mod: Modulator) void {
         mod.modulate(self.id, 0);
     }
+    /// Set oscillation frequency.
+    pub fn set(self: Triangle, f: Freq) void {
+        self.node.setParam(0, f.h);
+    }
 };
 pub const Noise = Node;
 pub const Empty = Node;
 pub const Zero = Node;
-pub const File = Node;
+pub const File = struct {
+    id: u32,
+    node: NodeMixin(@This()) = .{},
+    /// Go to the specified timestamp in the file.
+    pub fn seek(self: File, t: Time) void {
+        self.node.setParam(0, @floatFromInt(t.s));
+    }
+};
 
 pub const out: BaseNode = .{ .id = 0 };
 
@@ -616,4 +685,25 @@ test "Modulator covers every variant" {
     };
 
     for (mods) |m| m.modulate(0, 0);
+}
+
+test "typed setters compile" {
+    (Sine{ .id = 1 }).set(Freq.hz(440));
+    (Square{ .id = 1 }).set(Freq.hz(440));
+    (Sawtooth{ .id = 1 }).set(Freq.hz(440));
+    (Triangle{ .id = 1 }).set(Freq.hz(440));
+    (Gain{ .id = 1 }).set(0.5);
+    (Pan{ .id = 1 }).set(0.5);
+    (Mute{ .id = 1 }).mute();
+    (Mute{ .id = 1 }).unmute();
+    (Pause{ .id = 1 }).pause();
+    (Pause{ .id = 1 }).play();
+    (LowPass{ .id = 1 }).setFreq(Freq.hz(440));
+    (HighPass{ .id = 1 }).setFreq(Freq.hz(440));
+    (Clip{ .id = 1 }).setBoth(0.5);
+    (Clip{ .id = 1 }).setLow(0.5);
+    (Clip{ .id = 1 }).setHigh(0.5);
+
+    const file = out.node.addFile("audio.wav");
+    file.seek(Time.zero);
 }
