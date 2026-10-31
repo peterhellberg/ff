@@ -8,11 +8,13 @@ pub const Circle = ff.drawCircle;
 pub const Ellipse = ff.drawEllipse;
 pub const Image = ff.drawImage;
 pub const Line = ff.drawLine;
+pub const NineSlice = ff.drawNineSlice;
 pub const Point = ff.drawPoint;
 pub const Rect = ff.drawRect;
 pub const RoundedRect = ff.drawRoundedRect;
 pub const Sector = ff.drawSector;
 pub const SubImage = ff.drawSubImage;
+pub const SubTile = ff.drawSubTile;
 pub const Text = ff.drawText;
 pub const Triangle = ff.drawTriangle;
 
