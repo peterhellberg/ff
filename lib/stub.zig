@@ -4,7 +4,9 @@ export fn add_progress() u32 {
     return 4;
 }
 
-export fn add_score() void {}
+export fn add_score() i32 {
+    return 0;
+}
 export fn clear_screen() void {}
 export fn draw_arc() void {}
 export fn draw_circle() void {}
@@ -21,12 +23,20 @@ export fn draw_sub_tile() void {}
 export fn draw_text() void {}
 export fn draw_qr() void {}
 export fn draw_triangle() void {}
-export fn dump_file() void {}
+export fn dump_file() u32 {
+    return 0;
+}
 export fn flip_x() void {}
 export fn flip_y() void {}
-export fn get_file_size() void {}
-export fn get_me() void {}
-export fn get_peers() void {}
+export fn get_file_size() u32 {
+    return 0;
+}
+export fn get_me() u32 {
+    return 0;
+}
+export fn get_peers() u32 {
+    return 1;
+}
 
 export fn get_random() u32 {
     return 4;
@@ -42,14 +52,22 @@ export fn get_time() u64 {
     return 42;
 }
 
-export fn load_file() void {}
-export fn load_stash() void {}
+export fn load_file() u32 {
+    return 0;
+}
+export fn load_stash() u32 {
+    return 0;
+}
 export fn log_debug() void {}
 export fn log_error() void {}
 export fn open_menu() void {}
 export fn quit() void {}
-export fn read_buttons() void {}
-export fn read_pad() void {}
+export fn read_buttons() u32 {
+    return 0;
+}
+export fn read_pad() i32 {
+    return 0;
+}
 export fn remove_file() void {}
 export fn remove_menu_item() void {}
 export fn save_stash() void {}
